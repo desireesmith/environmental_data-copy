@@ -1,0 +1,287 @@
+---
+title: "Lab 7 Questions"
+author: "Desiree Smith"
+date: "10/31/2021"
+output: 
+  html_document:
+    highlight: zenburn
+    toc: TRUE
+    toc_float: 
+      collapsed: FALSE
+  
+---
+
+### Question 1 {.tabset .tabset-pills}
+What is the sample size, n? 
+
+```{r Q1}
+
+
+require(palmerpenguins)
+head(penguins)
+
+ penguins$species == "Gentoo"
+
+
+gen = subset(penguins,species == "Gentoo" )
+
+sum.gen = sum(is.na(gen$bill_length_mm))
+
+sum.gen
+
+#The sample size is 124 but there is a NA so it will be 123. 
+
+```
+### Question 2 {.tabset .tabset-pills}
+ 
+ What is the sample standard deviation?
+ 
+```{r Q2}
+sd(gen$bill_length_mm,na.rm = TRUE)
+
+```
+
+### Question 3 {.tabset .tabset-pills}
+What are the critical t-values?
+```{r Q3}
+crit = qt(0.95, 123,lower.tail = TRUE)#1.657
+
+qt(0.95, 123,lower.tail = FALSE)
+
+#The critical t- values are +-1.657
+
+```
+
+### Question 4 {.tabset .tabset-pills}
+What is the sample standard error?
+
+```{r Q4}
+rm(list = ls())
+
+sse_mean = function(x)
+  {na.x = is.na(x)
+  x2 = x[!na.x]
+  sd.x2 = sd(x2)
+  n = length(x2)
+  sse = sd.x2/(sqrt(n)) 
+  return(sse)
+}
+
+gen = subset(penguins,species == "Gentoo" )
+ sse = sse_mean(gen$bill_length_mm)
+
+ 
+ sse
+
+
+```
+
+### Question 5 {.tabset .tabset-pills}
+Construct the CI and show the R code you used for the calculation.
+
+```{r Q5}
+
+crit = qt(0.95, 123,lower.tail = TRUE)#1.657
+
+(crit * sse)
+#0.461
+
+#The parametric CI is 0.278 +- 0.461
+
+```
+
+### Questions 6 - 8 {.tabset .tabset-pills}
+
+
+```{r Q6 - Q8 {.t}
+
+
+require(boot)
+
+
+boot_mean = function(x, i)
+{
+  return(mean(x[i], na.rm = TRUE))
+}
+
+mypenboot = 
+  boot(
+    data = gen$bill_length_mm,
+    statistic = boot_mean,
+    R = 10000)
+print(mypenboot)
+
+str(mypenboot)
+
+#Calculating mean and sd
+mean(gen$bill_length_mm, na.rm = TRUE)# the mean is 47.40
+
+mypenboot$t0
+
+mean(mypenboot$t) - mypenboot$t0
+
+sd(mypenboot$t)
+
+#CI
+quantile(
+  mypenboot$t,
+  c(0.025, 0.975))
+
+# The confidence Interval is lower = 46.967 and upper = 48.05
+
+```
+
+### Question 9 {.tabset .tabset-pills}
+
+Show your completed rarefaction_sampler() function.
+```{r Q9}
+
+require("here")
+moths = read.csv(here("data", "moths.csv"))
+head(moths)
+moth_dat = moths[,-1] # how to remove a column
+head(moth_dat)
+
+
+
+rarefaction_sampler = function(input_dat, n_iterations)
+{
+  n = nrow(moth_dat) #number of rows or sample observations
+  m = 10000 #number of bootstrap iterations
+
+  moth_result = matrix(
+    nrow = m,
+    ncol = n)
+
+  # The outer loop: runs once for each bootstrap iteration.  index variable is i
+  for(i in 1:m)
+  {
+    # The inner loop: simulates increasing sampling intensity
+    # Sampling intensity ranges from 1 site to the complete count of sites (24)
+    # index variable is j
+    for(j in 1:n)
+    {
+
+      # sample the input data row indices, with replacement
+      rows_j = sample(n, size = j, replace=TRUE)
+
+      # Creates a new data matrix
+      t1 = moth_dat[rows_j, ]
+
+      # Calculates the column sums
+      t2 = apply(t1, 2, sum)
+
+      # Counts the number of columns in which any moths were observed
+      moth_result[i, j] = sum(t2 > 0)
+    }
+  }
+
+  return(moth_result)
+}
+
+rarefact = rarefaction_sampler(moth_dat, 100)
+head(rarefact)
+require("here")
+moths = read.csv(here("data", "moths.csv"))
+
+rarefaction_sampler = function(input_dat, n_iterations,n_input_rows)
+{
+  n_input_rows = nrow(input_dat)
+
+  results_out = matrix(
+    nrow = n_iterations,
+    ncol = n_input_rows)
+
+  # The outer loop: runs once for each bootstrap iteration.  index variable is i
+  for(i in 1:n_iterations)
+  {
+    # The inner loop: simulates increasing sampling intensity
+    # Sampling intensity ranges from 1 site to the complete count of
+    # sites in the input data (n)
+    for(j in 1:n_input_rows)
+    {
+      # sample the input data row indices, with replacement
+      rows_j = sample(n_input_rows, size = j, replace=TRUE)
+
+      # Creates a new data matrix
+      t1 = input_dat[rows_j, ]
+
+      # Calculates the column sums
+      t2 = apply(t1, 2, sum)
+
+      # Counts the number of columns in which any moths were observed
+      results_out[i, j] = sum(t2 > 0)
+    }
+  }
+  return(results_out)
+}
+
+rarefact = rarefaction_sampler(moth_dat, 10000)
+
+
+head(rarefact)
+```
+
+### Question 10 {.tabset .tabset-pills}
+ I had a hard time trying to correct the error of some the "n" and "rarefact" not being defined. I could not figure out how to correct it without guidance. 
+
+### Question 11 and 12 {.tabset .tabset-pills}
+
+```{r Q11 and Q12}
+n = nrow(moth_dat) #number of rows or sample observations
+
+m = 10000 #number of bootstrap iterations
+
+moth_result = matrix(
+  nrow = m,
+  ncol = n)
+
+
+# The outer loop: runs once for each bootstrap iteration.  index variable is i
+for(i in 1:m)
+{
+  # The inner loop: simulates increasing sampling intensity
+  # Sampling intensity ranges from 1 site to the complete count of sites (24)
+  # index variable is j
+  for(j in 1:n)
+  {
+    # sample the input data row indices, with replacement
+    rows_j = sample(n, size = j, replace=TRUE)
+
+    # Creates a new data matrix from the resampled rows.
+    t1 = moth_dat[rows_j, ]
+
+    # Calculates the column sums of the new data matrix.
+    t2 = apply(t1, 2, sum)
+
+    # Counts the number of columns in which any moths were observed
+    moth_result[i, j] = sum(t2 > 0)
+  }
+}
+
+#Building the curve 
+moths = read.csv(here("data", "moths.csv"))
+rarefact = rarefaction_sampler(moths[,-1], 10000)
+
+rare_mean = apply(rarefact, 2, mean)
+rare_quant = apply(rarefact, 2, quantile, probs=c(0.025, 0.975))
+rare = t(rbind(rare_mean, rare_quant))
+matplot(
+  rare,
+  type='l',
+  xlab='Number of sampling plots',
+  ylab='Species richness',
+  main='Rarefaction Curve for Moth Abundance')
+
+legend(
+  'bottomright',
+  legend=c('mean','2.5%','97.5%'),
+  lty=c(1,2,3),col=c(1,2,3), inset=c(.1,.1))
+```
+
+### Question 13 {.tabset .tabset-pills}
+
+About how many sites should you visit if you want to see all of the moth species? Explain your reasoning using your rarefaction curve figure.
+
+All the points merge at around point 24 so I believe this is the number of sampling plots you would need to visit to see all of the moth species. 
+

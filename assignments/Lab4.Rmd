@@ -1,0 +1,322 @@
+---
+title: "Lab4"
+subtitle: Desiree Smith
+author: Alex Fink, JT and Ethan
+date: "9/29/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r}
+x = seq(-3, 3, length.out = 1000)
+y = dnorm(x)
+
+plot(x, y, main = "Normal PDF", type = "l")
+abline(h = 0)
+
+```
+```{r}
+require(palmerpenguins)
+hist(
+  penguins$body_mass_g,
+  main = "Histogram of Penguin Body Mass",
+  xlab = "Body Mass (g)"
+)
+
+mean(penguins$body_mass_g, na.rm = TRUE) #4201.754
+sd(penguins$body_mass_g, na.rm = TRUE) #801.95
+nrow(penguins) #344
+```
+
+```{r}
+dat_1 = rnorm(n = 344, mean = 202, sd = 802)
+dat_2 = rnorm(n = 344, mean = 4202, sd = 802)
+dat_3 = rnorm(n = 344, mean = 4202, sd = 802)
+dat_4 = rnorm(n = 344, mean = 4202, sd = 802)
+
+par(mfrow = c(2,2))
+
+hist(dat_1)
+hist(dat_2)
+hist(dat_3)
+hist(dat_4)
+```
+
+```{r}
+set.seed(12)
+dat_unif = runif(n =27, min = 0, max = 4)
+hist(dat_unif)
+
+set.seed(1)
+dat_unif_1 = runif(n = 270, min = 0, max = 4)
+set.seed(1)
+dat_unif_2 = runif(n = 270, min = 0, max = 4)
+
+par(mfrow = c(1, 2))
+hist(dat_unif_1)
+hist(dat_unif_2)
+
+```
+
+```{r}
+set.seed(123)
+n = 17
+slope = 0.7
+intcp = 0.2
+
+guess_x = 6
+guess_y = 4
+guess_slope = 0.72
+
+x = runif(n = n, min = 1, max = 10)
+y = rnorm(n = n, mean = slope * x + intcp)
+
+line_point_slope = function(x, x1, y1, slope)
+{
+  get_y_intercept = 
+    function(x1, y1, slope) 
+      return(-(x1 * slope) + y1)
+  
+  linear = 
+    function(x, yint, slope) 
+      return(yint + x * slope)
+  
+  return(linear(x, get_y_intercept(x1, y1, slope), slope))
+}
+
+plot(x, y, pch = 16)
+curve(line_point_slope(x, guess_x, guess_y, guess_slope), add = T)
+
+n_pts = 10
+x_min = 1
+x_max = 10
+x = runif(n = n_pts, min = x_min, max = x_max)
+
+dat = data.frame(x = x, y_observed = rnorm(n_pts))
+
+plot(y_observed ~ x, data = dat, pch = 8)
+
+line_point_slope = function(x, x1, y1, slope)
+{
+  get_y_intercept = 
+    function(x1, y1, slope) 
+      return(-(x1 * slope) + y1)
+  
+  linear = 
+    function(x, yint, slope) 
+      return(yint + x * slope)
+  
+  return(linear(x, get_y_intercept(x1, y1, slope), slope))
+  
+}
+
+n_pts = 10
+x_min = 1
+x_max = 10
+x = runif(n = n_pts, min = x_min, max = x_max)
+
+dat = data.frame(x = x, y_observed = rnorm(n_pts))
+
+plot(y_observed ~ x, data = dat, pch = 8)
+
+guess_x = 6
+guess_y = 0
+guess_slope = 0.1
+
+plot(y_observed ~ x, data = dat, pch = 8)
+curve(line_point_slope(x, guess_x, guess_y, guess_slope), add = T)
+
+dat$y_predicted = line_point_slope(dat$x, guess_x, guess_y, guess_slope)
+
+
+dat$resids = (dat$y_observed - dat$y_predicted)
+
+sum(dat$resids)
+
+
+```
+
+
+__Question 1__
+```{r}
+norm_17 = rnorm(n = 17, mean = 10.4, sd = 2.4)
+norm_30 = rnorm(n = 30, mean = 10.4, sd = 2.4)
+norm_300 = rnorm(n = 300, mean = 10.4, sd = 2.4)
+norm_3000 = rnorm(n = 3000, mean = 10.4, sd = 2.4)
+```
+
+__Question 2__
+```{r}
+par(mfrow = c(2,2))
+
+hist(norm_17, main = "17 Random Data Points", xlab = "Data Points", col = "rosybrown")
+hist(norm_30,  main = "30 Random Data Points", xlab = "Data Points", col = "seashell")
+hist(norm_300,  main = "300 Random Data Points", xlab = "Data Points", col ="lightcyan")
+hist(norm_3000,  main = "3000 Random Data Points", xlab = "Data Points", col = "palegreen")
+
+
+```
+__Question 3__
+```{r}
+image_file = "lab_04_hist_01.0.png"
+
+require(here)
+
+{
+png(
+  here("Images", "lab_04_hist_01.png"),
+  width = 1500, height = 1600)
+par(mfrow = c(2,2))
+
+hist(norm_17, main = "17 Random Data Points", xlab = "Data Points", col = "rosybrown")
+hist(norm_30,  main = "30 Random Data Points", xlab = "Data Points", col = "seashell")
+hist(norm_300,  main = "300 Random Data Points", xlab = "Data Points", col ="lightcyan")
+hist(norm_3000,  main = "3000 Random Data Points", xlab = "Data Points", col = "palegreen")
+
+dev.off()
+}
+
+
+```
+
+
+__Question 4__
+Two of the histogram have a normal distribution. They have a bell shaped curve.Two seem to be more uniform. There is not a distinct curve. 
+
+__Question 5__
+The shapes of the histograms are different because I am using rnorm.This will give me random numbers each time. It seems that as the data points increases the shape started to become more like a bell curve. 
+
+__Question 6__
+The parameters that I used for the Normal distribution are mean and standard deviation.
+
+__Question 7__
+```{r}
+
+require(here)
+
+pdf(file = here("Images", "norm_1.pdf"))
+
+x = seq(3, 19, length.out = 1000)
+y = dnorm(x, mean = 10.4, sd = 2.4)
+
+plot(x, y, main = "Standard Normal PDF: mean = 10.4 and sd = 2.4", type = "l", xlim = c(3, 19))
+abline(h = 0)
+
+
+
+
+
+
+```
+
+__Question 8__
+Upload File
+
+__Question 9__
+```{r}
+n_pts = 56
+x_min = 1
+x_max = 80
+x = runif(n = n_pts, min = x_min, max = x_max)
+dat_4 = data.frame(x = x, y_observed = rnorm(n_pts))
+dat_4
+
+rnorm(56)
+set.seed(123)
+
+par(mfrow = c(2,2))
+
+image_file = "Random_Plots.png"
+
+require(here)
+
+{
+png(
+  here("Images", "Random_Plots.png"),
+  width = 1500, height = 1600)
+par(mfrow = c(2,2))
+
+plot(dat_4, main = "Random Numbers", xlab = "data points", ylab = "y observed", col = "palegreen4")
+
+boxplot(dat_4, main = "Random Number 2.0", xlab = "data points", ylab = "y observed", col = "red4")
+
+hist(dat_4$x, main = "Random Number 3.0", xlab = "data points", ylab = "y observed", col = "lavenderblush",
+border = "plum4")
+
+barplot(dat_4$y_observed, main = "Random Number 4.0", xlab = "data points", ylab = "y observed", col = "darkblue")
+
+}
+
+
+```
+
+__Question 10__
+Upload image 
+
+__Question 11__
+```{r}
+
+png(
+  here("Images", "Line_Slope.png"),
+  width = 1500, height = 1600)
+
+line_point_slope = function(x, x1, y1, slope)
+  
+{
+  get_y_intercept = 
+    function(x1, y1, slope) 
+      return(-(x1 * slope) + y1)
+  
+  linear = 
+    function(x, yint, slope) 
+      return(yint + x * slope)
+  
+  return(linear(x, get_y_intercept(x1, y1, slope), slope))
+  
+}
+
+plot(dat_4, main = "Random Numbers", xlab = "data points", ylab = "y observed", col = "palegreen4")
+
+logistic_midpoint_slope = function(x, midpoint, slope)
+{
+  b = get_logistic_param_b(slope)
+  a = get_logistic_param_a(slope, midpoint)
+  return(logistic(x, a, b))
+}
+
+guess_x = 5
+guess_y = -3
+guess_slope = 0.1
+
+plot(y_observed ~ x, data = dat_4, pch = 8, col = "darkmagenta")
+curve(line_point_slope(x, guess_x, guess_y, guess_slope), add = T)
+
+
+```
+__Question 12__
+Upload image
+
+__Question 13 and Question 14__
+```{r}
+
+dat_4$y_predicted = line_point_slope(dat_4$x, guess_x, guess_y, guess_slope)
+dat_4
+
+
+dat_4$resids = (dat_4$y_observed - dat_4$y_predicted)
+
+dat_4
+
+#Question 14
+
+hist(dat_4$resids, main = "Model Residuals", xlab = "data points", ylab = "y observed", col = "darkorange3",
+border = "gold2")
+
+plot(dat_4$y_predicted, dat_4$resids, main = "Model's Predicted Values", xlab = "Predicted Values", ylab = "Residuals", col = "indianred") 
+
+ 
+
+```
+

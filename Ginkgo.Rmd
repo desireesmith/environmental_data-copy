@@ -1,0 +1,20 @@
+---
+title: "Ginkgo"
+author: "Desiree Smith"
+date: "11/23/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require("here")
+ginko = read.csv(here("data", "ginkgo_data_2021.csv"))
+
+boxplot(notch_depth ~ seeds_present , data = ginko,
+        ylab = "Notch Depth", xlab = "Seeds Present")
+
+plot (ginko$max_depth, ginko$max_width , data = ginko, pch = 16, col = "58"
+      )
+
+```
+
+

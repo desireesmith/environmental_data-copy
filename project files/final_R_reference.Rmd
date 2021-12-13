@@ -1,0 +1,508 @@
+---
+title: "Final Project"
+author: "Desiree Smith"
+date: "12/2/2021"
+output: 
+ html_document:
+    highlight: breezedark
+    toc: TRUE
+    toc_float: 
+      collapsed: FALSE
+    theme: darkly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# R Reference Guide {.tabset .tabset-pills}
+
+
+## Loading Data and Packages
+
+
+```{r Loading palmer penguins and here}
+require(here)
+require(palmerpenguins)
+library(palmerpenguins) 
+
+ginkgo = read.csv(here("data", "ginkgo_data_2021.csv"))
+```
+
+
+## Data Structures
+
+### c()
+
+* The function c() combines or concatenates its arguments into a vector (a 1-dimensional data structure consisting of 1 or more elements).
+
+* All of the elements must be of the same type.
+I can’t combine character and numeric types in the same call to c()
+Here’s two examples using numeric and character data types
+
+```{r}
+# Create a vector of numbers:
+num_vec  = c(1, 4, 8, 9, 13)
+```
+
+
+### length()
+
+* Helps to determine and set the length of vectors and factors
+
+```{r}
+length(ginkgo$max_width)
+```
+
+### matrix()
+
+* Helps to create a 2D data structure using your data. It can be created from vectors.
+
+```{r}
+matrix(ginkgo$max_width, byrow= 3, ncol= 6)
+```
+
+### data.frame()
+
+* Data frame is a way of storing data in R and how to structure it.They have the same number of rows.
+```{r}
+ginkgo_df= data.frame(ginkgo$max_width, ginkgo$max_depth)
+ginkgo_df 
+```
+
+
+* __nrow__ is used to return the number of rows of the specified matrix and __ncol__ is used to return the number of columns. 
+```{r}
+nrow(ginkgo_df)
+ncol(ginkgo_df)
+```
+
+
+* dim is used to return/sets the dimension of the matrix. It shows the amount of rows and columns 
+
+```{r}
+dim(ginkgo_df)
+```
+
+## Subsetting 
+
+* Is a way to select variable and observations.You can use subset to specify the rows and columns you want to select in the data frame. You can subset by position and data frame as well.
+
+```{r}
+#subsetting by name 
+ginkgo$max_width
+
+#subsetting by position.
+ginkgo[1,]
+ginkgo[2,3]
+ginkgo[,3]
+
+subset(penguins, species == "Adelie")
+
+```
+
+
+## Numerical Data Exploration
+
+* The summary function helps to put together a summary of statistics of data and model.
+
+```{r}
+summary(ginkgo)
+summary(ginkgo$max_width)
+```
+
+* mean () calculates the mean of the data you specifies and sd() helps to calculates the standard deviation.
+```{r}
+mean(ginkgo$max_width)
+
+sd(ginkgo$max_width)
+```
+
+## Graphical Data Exploration
+
+* col = can be used to add color to your graph
+* main = allows you to create a title for the graph
+* xlab = and ylab = are used to label the x and y axis
+* xlim = and ylim =
+* pch = allows you to change the shape of your symbol in scatterplots and other graphics. 
+* cex = allows you to change the size of your symbol
+
+```{r fig.width=10}
+ginkgo = read.csv(here("data", 
+                       "ginkgo_data_2021.csv"))
+
+
+ plot(max_depth ~ max_width, 
+      data = ginkgo, 
+      xlim = c(0,100),  
+      ylim = c(0, 100),
+  main = "Ginkgo Leaf Depth and Leaf Width",
+  ylab = "max leaf width", 
+  xlab = "max leaf depth", 
+  col = "palegreen", 
+  pch = 20, cex = 0.75)
+```
+
+* breaks = is used to control the number of bars, cells or bins in a histogram
+```{r fig.width=10}
+hist(penguins$flipper_length_mm,
+     main = "Penguin Flipper Length", 
+     xlab = "flipper length (mm)", 
+     col = "steelblue1", 
+     border = "yellowgreen", 
+     breaks = 40)
+```
+
+```{r fig.width=10}
+boxplot(ginkgo$petiole_length, col = "sandybrown")
+
+boxplot(notch_depth ~ seeds_present , 
+        data = ginkgo, 
+        ylab = "Notch Depth", 
+        xlab = "Seeds Present", 
+        col = "sandybrown")
+```
+
+* par(mfrow = c() creates a grid to to display your figures. For example, if you want two figures on the top and two at the bottom you use par(mfrow = c(2,2))
+
+### 4-panel figure of Histogram 
+```{r fig.width=10}
+dat_1 = rnorm(n = 344, mean = 202, sd = 802)
+dat_2 = rnorm(n = 344, mean = 4202, sd = 802)
+dat_3 = rnorm(n = 344, mean = 4202, sd = 802)
+dat_4 = rnorm(n = 344, mean = 4202, sd = 802)
+
+par(mfrow = c(2,2))
+
+hist(dat_1, 
+     main = "Random Data Histogram #1", 
+     xlab = "Data ", 
+     col = "yellow2")
+hist(dat_2, 
+     main = "Random Data Histogram #2", 
+     xlab = "Data ", 
+     col = "plum1")
+hist(dat_3, 
+     main = "Random Data Histogram #3", 
+     xlab = "Data ", 
+     col = "seashell")
+hist(dat_4, 
+     main = "Random Data Histogram #4", 
+     xlab = "Data ", 
+     col = "darkorange")
+```
+
+## Distribution Functions
+
+* dnorm = density function of the normal distribution
+```{r}
+dnorm(6, mean = 10.4, sd = 2.4)
+```
+
+* pnorm = distribution function 
+```{r}
+pnorm(1.2, mean = 2, sd = 2)
+```
+
+* qnorm = quantile function
+```{r}
+qnorm(0.85,mean=70,sd=3)
+```
+
+* dbinom(x, size, prob, log = FALSE)
+```{r}
+dbinom(3, 4, 0.75, log = FALSE)
+```
+
+* pbinom(q, size, prob, lower.tail = TRUE, log.p = FALSE)
+```{r}
+pbinom(3, 4, 0.75,lower.tail = TRUE,
+       log.p = FALSE )
+```
+
+* qbinom(p, size, prob, lower.tail = TRUE, log.p = FALSE)
+```{r}
+qbinom(.10, size=10, prob=.4)
+```
+
+### Part 2
+
+## Numerical Exploration
+```{r}
+delomy = read.csv(here("data","delomys.csv"))
+
+body_mass = summary(delomy$body_mass)
+body_length = summary(delomy$body_length)        
+shapiro.test(body_mass)
+
+shapiro.test(body_length)
+```
+
+
+```{r plot size, fig.width=10, include=FALSE}
+delomy = read.csv(here("data", "delomys.csv"))
+
+par(mfrow = c(2,1))
+#A histogram of body mass
+hist(delomy$body_mass, 
+     main = "Body Mass", 
+     col = "tomato1", 
+     border = "ghostwhite", 
+     xlab = "Body Mass")
+
+#Histogram of Body Length
+hist(delomy$body_length, 
+     main = "Body Length", 
+     col = "tomato3", 
+     border = "ghostwhite", 
+     xlab = "Body Length", 
+     breaks = 20)
+
+#Conditional Boxplots 
+boxplot(body_mass ~ binomial,
+    data = delomy, 
+    ylab = "body mass (g)",
+    col= "peachpuff1")
+
+boxplot(body_mass ~ sex,
+    data = delomy, 
+    ylab = "body mass (g)",
+    col= "peachpuff1")
+
+boxplot(body_mass ~ binomial * sex,
+    data = delomy, 
+    ylab = "body mass (g)", 
+    col= "peachpuff1")
+```
+
+## Question 1
+Qualitatively describe the relationship between body mass and length.
+Does the relationship seem linear, curved, nonexistent?
+
+There is a clear relationship between body mass and length. The relationship is a positive relationship based on the direction it is going. It has more of a curve than a linear shape.
+
+```{r fig.width=10}
+plot(body_length ~ body_mass, 
+     data = delomy, 
+     main = "Body Mass and Body length", 
+     col = "lightpink", border = "lightgreen", 
+     xlab = "Body Mass (g)", 
+     ylab = "Body Length")
+
+```
+
+
+```{r fig.width=3, fig.height= 8, fig.aspect= 2}
+par(mfrow = c(2,1))
+#A histogram of body mass
+hist(delomy$body_mass, 
+     main = "Body Mass", 
+     col = "tomato1", border = "ghostwhite", 
+     xlab = "Body Mass")
+
+#Histogram of Body Length
+hist(delomy$body_length, 
+     main = "Body Length", 
+     col = "tomato3", border = "ghostwhite", 
+     xlab = "Body Length", 
+     breaks = 17)
+```
+
+## Question 2
+Qualitatively describe the shapes of the histograms.
+Do the data appear normally-distributed? Explain why or why not.
+
+The body mass histogram looks to be more normally distributed and centered than the histogram with body length. The body length graph seems to have some outliers which seems to skew the histogram to the left. 
+
+## Question 3 
+Using both the histograms and normality tests, do you think the (unconditioned) body masses and body length are normally-distributed?
+Contrast your visual assessment of normality to the results of the numerical normality tests.
+
+By looking at the shapiro.test I can see that both body mass and body length seem to have large p values. This tells us that both of the models follow the normality assumption. Visually the body length histogram seems like it is not normally distributed while body mass does look normally distributed.
+
+
+## Question 4 
+ Examine the conditional boxplots. Describe any graphical evidence you see for body mass differences based on species and/or sex.
+ 
+  Based on the boxplots, I can see that the species Delomys dorsalis has larger females and they weight more than male of the same species. And it is the opposite for the Delomys sublineatus. They have larger males than females. 
+
+```{r}
+#Conditional Boxplots 
+boxplot(body_mass ~ binomial,
+    data = delomy, 
+    ylab = "body mass (g)",
+    col= "peachpuff1")
+
+boxplot(body_mass ~ sex,
+    data = delomy, 
+    ylab = "body mass (g)",
+    col= "peachpuff1")
+
+boxplot(body_mass ~ binomial * sex,
+    data = delomy, 
+    ylab = "body mass (g)", 
+    col= "peachpuff1")
+```
+## Question 5
+
+```{r Model Building }
+
+fit1 = lm(body_length ~ body_mass,
+          data = delomy)
+
+fit2 =
+  lm( formula = body_mass
+    ~ sex,
+    data = delomy)
+
+fit3 = 
+  lm(formula = body_mass ~ binomial,
+    data = delomy)
+
+fit4 = lm(
+    formula = body_mass ~ sex + binomial,
+    data = delomy)
+
+fit5 = lm(
+    formula = body_mass ~ sex * binomial,
+    data = delomy)
+
+
+```
+
+## Question 5 
+```{r Model Diagnostics}
+
+par(mfrow = c(2,3))
+hist(fit1$residuals)
+hist(fit2$residuals)
+hist(fit3$residuals)
+hist(fit4$residuals)
+hist(fit5$residuals)
+
+shapiro.test(fit1$residuals) #W = 0.73462,
+#p-value < 2.2e-16
+shapiro.test(fit2$residuals) #W = 0.99563, 
+#p-value = 0.0001541
+shapiro.test(fit3$residuals) #W = 0.99535,
+#p-value = 8.103e-05
+shapiro.test(fit4$residuals) #W = 0.99525, 
+#p-value = 6.805e-05
+shapiro.test(fit5$residuals) #W = 0.99526,
+#p-value = 6.816e-05
+
+#The test rejects the hypothesis of normality
+#when the p-value is less than or equal to 0.05.
+
+```
+
+
+What do you conclude about residual normality based on the numerical and graphical diagnostics?
+
+Based on the numerical diagnostics, I can see that the for each of the fit models they do not follow the normality assumption. They all have low p-values this will cause us to reject the hypothesis of normality. By looking at the graphical diagnostics, it appears that the histograms look fairly normally distributed except for fit1 model.
+
+## Question 6 
+Are violations of the normality assumption equally severe for all the models?
+
+They are not equally severe for all the models. By looking at my histograms, I can see visually that the fit1 histogram seems to violate the normality assumptions the most and numerically it has the smallest p-value which confirms that we would reject the normality assumption.  
+
+## Question 7
+
+```{r}
+knitr::kable(coef(summary(fit1)))
+
+```
+
+
+What is the magnitude of the mass/length relationship?
+
+To create my coefficient I used the fit1 model and by looking at the table I can see that the magnitude of the relationship is 0.875. 
+
+## Question 8
+What is the expected body length of an an animal that weighs 100g?
+```{r}
+(76.1246565 + (0.8754988 * 100))
+```
+
+
+## Question 9
+What is the expected body length of an animal that weighs 0g?
+
+```{r Body Mass: Model Coefficients}
+(76.1246565 + (0.8754988 * 0))
+```
+
+
+## Question 10
+
+```{r Coef}
+coef(fit2)
+coef(fit3)
+coef(fit4)
+coef(fit5)
+```
+
+What is the base level for sex?
+
+Female is the base level for sex.
+
+## Question 11
+What is the base level for binomial?
+
+Delomys dorsalis is the base level for binomial. 
+
+## Question 12
+ Which sex is heavier?
+ 
+ If you are just looking at the sex overall using coef(fit2) then the males would be the heavier sex. But it would defiantly depend on the species. The males are heavier in the Delomys sublineatus species but the females are heavier in the Delomys dorsalis. 
+
+## Question 13
+Which species is heavier?
+
+Delomys dorsalis is the heavier species between the two. 
+
+## Question 14
+
+```{r ANOVA table}
+knitr::kable(anova(fit2)) # Pr = 0.0001951
+knitr::kable(anova(fit3)) # Pr = 0
+knitr::kable(anova(fit4)) # sex Pr = 0.0001144 bin Pr = 0
+knitr::kable(anova(fit5)) # sex = 0.0001150 binomial = 0 sex:binomial = 0.9504424
+```
+
+
+
+Are sex and species significant predictors for body mass?
+
+The species and sex both have an effect on the body mass of the individual. 
+
+## Question 15
+Is there a significant interaction?
+
+When looking at the species and sex on its own it is significant but when you look at the interaction between body mass and species together it is not significant. It has a large p value of 0.9504424 showing that it is not that significant. 
+
+## Question 16 
+How does the significance (as measured by p-value) of either of the main effects (sex and species) differ between the single-predictor models, the additive model, and the interactive model?
+
+ I can see that the p-values vary sightly between the different models but it is not a significant difference. 
+
+## Question 17
+
+```{r AIC}
+AIC(fit2) # 13006.8
+AIC(fit3) # 12966.36
+AIC(fit4) # 12896.73
+AIC(fit5) # 12898.72
+
+```
+
+
+ Which two models have the lowest AIC?
+ 
+ Fit models 4 and 5 have the lowest AIC.
+
+## Question 18
+Which of the two models with lowest AIC scores would you select?
+Explain your decision based on model fit and the complexity/understanding tradeoff.
+
+Even though fit5 has the the lowest AIC scores I would select fit4 as my model. I feel like the fit 5 model has more complex and has a lot more components. Since they are similar in fitness then I would rather pick the model that is easier to explain and understand. 

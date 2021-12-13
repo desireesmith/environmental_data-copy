@@ -1,0 +1,221 @@
+---
+title: "Lab3:DataExploration_D.Smith"
+subtitle: "Desiree Smith
+author: "Worked with Alex Fink"
+date: "9/22/2021"
+output: html_document
+---
+
+```{r}
+install.packages("psych")
+require(psych)
+pairs.panels(iris)
+
+
+```
+```{r}
+require(here)
+dat_bird = read.csv(here("data", "bird.sta.csv"))
+head(dat_bird)
+dat_habitat = data.frame(read.csv(here("data", "hab.sta.csv")))
+dat_habitat
+dat_all = merge(dat_bird,data_habitat)
+dat_all
+
+plot(ba.tot ~ elev, data = dat_all)
+```
+
+```{r}
+sample(dat_all$CEWA, 100)
+
+my_vec = rep(1:3, 5)
+my_vec == 3
+my_vec > 1
+
+cewa = dat_all$CEWA 
+cewa
+
+cewa_present_absent = (cewa >= 1)
+cewa_present_absent
+
+plot(x = dat_all$elev, y = cewa_present_absent)
+
+# Function to calculate the logistic parameter a given the slope and midpoint
+get_logistic_param_a = function(slope, midpoint)
+{
+  b = slope / 4
+  return (-midpoint * (slope / 4))
+}
+
+# Function to calculate the logistic parameter b given the slope
+get_logistic_param_b = function(slope)
+{
+  return (slope / 4)
+}
+
+
+# Calculate the value of the logistic function at x, given the parameters a and b.
+logistic = function(x, a, b)
+{
+  val = exp(a + b * x)
+  return(val / (1 + val))
+}
+
+# Calculate the value of the logistic function at x, given a slope and midpoint.
+logistic_midpoint_slope = function(x, midpoint, slope)
+{
+  b = get_logistic_param_b(slope)
+  a = get_logistic_param_a(slope, midpoint)
+  return(logistic(x, a, b))
+}
+
+#Positive slope
+{
+plot(x = dat_all$elev, y = cewa_present_absent)
+curve(logistic_midpoint_slope(x, midpoint = 370, slope = 0.05), add = TRUE)
+}
+
+#negative slope
+plot(x = dat_all$elev, y = cewa_present_absent)
+curve(logistic_midpoint_slope(x, midpoint = 400, slope = -0.1), add = TRUE)
+
+#Shallower negative slope
+plot(x = dat_all$elev, y = cewa_present_absent)
+curve(logistic_midpoint_slope(x, midpoint = 400, slope = -0.05), add = TRUE)
+
+
+
+
+```
+ 
+__Question 1__
+The basal area is square meters per hectares.
+
+__Question 2__
+```{r}
+require(psych)
+pairs.panels(dat_all[ , c("elev", "ba.tot", "slope", "aspect")])
+
+```
+
+__Question 3__
+
+```{r}
+WAVI = dat_all$WAVI
+WAVI
+
+wavi_present_absent = (WAVI >= 1)
+wavi_present_absent
+
+# Function to calculate the logistic parameter a given the slope and midpoint
+get_logistic_param_a = function(slope, midpoint)
+{
+  b = slope / 4
+  return (-midpoint * (slope / 4))
+}
+
+# Function to calculate the logistic parameter b given the slope
+get_logistic_param_b = function(slope)
+{
+  return (slope / 4)
+}
+
+
+# Calculate the value of the logistic function at x, given the parameters a and b.
+logistic = function(x, a, b)
+{
+  val = exp(a + b * x)
+  return(val / (1 + val))
+}
+
+# Calculate the value of the logistic function at x, given a slope and midpoint.
+logistic_midpoint_slope = function(x, midpoint, slope)
+{
+  b = get_logistic_param_b(slope)
+  a = get_logistic_param_a(slope, midpoint)
+  return(logistic(x, a, b))
+}
+
+plot(x = dat_all$ba.tot, y = wavi_present_absent, col = "orange")
+curve(logistic_midpoint_slope(x, midpoint = 100, slope = -0.6), add = TRUE)
+
+```
+__Question 4__
+The birds seem to prefer areas with low tree cover. They were found in area with lower tree densities. There are also a couple birds that were found in an area with high tree cover but the majority of them that are present are in lower tree densities. 
+
+__Question 5__
+```{r}
+SWTH = dat_all$SWTH
+SWTH
+
+swth_present_absent = (SWTH >= 1)
+swth_present_absent
+
+# Function to calculate the logistic parameter a given the slope and midpoint
+get_logistic_param_a = function(slope, midpoint)
+{
+  b = slope / 4
+  return (-midpoint * (slope / 4))
+}
+
+# Function to calculate the logistic parameter b given the slope
+get_logistic_param_b = function(slope)
+{
+  return (slope / 4)
+}
+
+
+# Calculate the value of the logistic function at x, given the parameters a and b.
+logistic = function(x, a, b)
+{
+  val = exp(a + b * x)
+  return(val / (1 + val))
+}
+
+# Calculate the value of the logistic function at x, given a slope and midpoint.
+logistic_midpoint_slope = function(x, midpoint, slope)
+{
+  b = get_logistic_param_b(slope)
+  a = get_logistic_param_a(slope, midpoint)
+  return(logistic(x, a, b))
+}
+
+plot(x = dat_all$ba.tot, y = swth_present_absent, col = "blue")
+curve(logistic_midpoint_slope(x, midpoint = 100, slope = -0.7), add = TRUE)
+```
+
+__Question 6__
+The birds seem to prefer areas with low tree cover. On the plot there is a lot of birds present in areas with low tree cover on the left top hand corner of the graph. 
+
+__Question 7 and Question 8__
+
+```{r}
+total_GRJA = dat_all$GRJA
+sum(total_GRJA)
+
+#The total number of Gray Jays that were observed were 181
+```
+
+__Question 9 and Question 10__
+
+```{r}
+my_vec = dat_all$GRJA
+my_vec >= 1
+sum_vec = as.numeric(my_vec)
+sum(my_vec)
+
+my_vec
+
+
+grja_present_absent = (my_vec >= 1)
+grja_present_absent
+sum(grja_present_absent)
+
+#The total number of sample sites that the Gray Jays were observed were 110
+```
+
+```{r}
+install.packages("yaml")
+require("yaml")
+```
+

@@ -1,0 +1,118 @@
+---
+title: "Using Models 2"
+author: "Desiree Smith"
+date: "11/18/2021"
+output: html_document
+---
+
+```{r Walkthrough, include=FALSE}
+require(palmerpenguins)
+
+#T-test
+t.test(subset(penguins, species == "Gentoo")$flipper_length_mm)
+
+t.test(
+  x = subset(penguins, species == "Gentoo")$flipper_length_mm,
+  mu = 218
+)
+
+t.test(
+  x = subset(penguins, species == "Gentoo")$flipper_length_mm,
+  mu = 218,
+  alternative = "less"
+)
+
+t.test(flipper_length_mm ~ species, data = subset(penguins, species != "Chinstrap"))
+
+#Analysis of Variance (ANOVA)
+par(mfrow = c(1, 2))
+hist(penguins$body_mass_g, breaks = 80, main = "histogram of body mass", xlab = "body mass (g)")
+plot(density(penguins$body_mass_g, na.rm = TRUE), main = "density plot of body mass")
+
+#Boxplot
+require(palmerpenguins)
+boxplot(body_mass_g ~ species, data = penguins)
+
+dat_chinstrap = subset(penguins, species == "Chinstrap")
+mean(dat_chinstrap$body_mass_g, na.rm = TRUE)
+
+shapiro.test(dat_chinstrap$body_mass_g)
+
+aggregate(body_mass_g ~ species, data = penguins, FUN = mean)
+
+#Fit a linear model
+fit_species = lm(body_mass_g ~ species, data = penguins)
+
+summary(fit_species)
+
+#Conduct the ANOVA
+anova(fit_species)
+
+#Two-Way Additive ANOVA
+boxplot(body_mass_g ~ species, data = penguins)
+
+fit_additive = lm(body_mass_g ~ sex + species, data = penguins)
+
+
+```
+
+### Question 1
+```{r}
+boxplot(body_mass_g ~ sex * species,
+    data = penguins, ylab = "body mass (g)",col= "lightsalmon",
+   names = c("Adelie\n female",
+             "Adelie\n male",
+             "Chinstrap\n female",
+             "Chinstrap\n male",
+             "Gentoo\n female",
+             "Gentoo\n male"
+             
+             ))
+```
+
+### Question 2
+Based on the boxplots, do you think male penguins (of any species) are significantly heavier than female penguins? Explain your reasoning.
+
+I do think that the male penguins are significantly higher than female penguins when looking at the Adelie and Gentoo penguins based on the boxplots.The chinstrap male penguins are only slightly larger than the female chinstrap penguins.
+
+### Question 3
+Do you think adding sex to a model that already includes species will improve the model fit?
+
+I do think that adding the sex to the model inproved the model fitness. When I looked at the boxplot conditioned only by species the Adelie and Chinstrap mean values were similar to one another with Gentoo above both of them. By adding sex it can add more data and so we could the difference between all three groups. It showed that Adelie and Gentoo had a more similar relationship between the sex and species than Chinstrap.
+
+### Question 4
+Show the R-code you used to build fit_both
+
+```{r}
+fit_both = lm(body_mass_g ~ sex * species, data = penguins)
+summary(fit_both)
+```
+
+
+### Question 5
+What is the base case for the two-way model that includes sex and species?
+
+The base case is Female Adelie penguins 
+
+### Question 6
+What are the names of the two coefficients (from the first column of the coefficient table) you need to calculate the average mass of female Chinstrap penguins?
+
+You will need to look at the Intercept (Adelie female) and the speciesChinstrap coefficients 
+
+### Question 7
+What is the predicted average mass of female Chinstrap penguins in the interactive model?
+
+```{r}
+(3368.84 + 158.37) 
+```
+
+
+### Question 8
+What is the observed average mass of female Chinstrap penguins, calculated from the penguins data?
+
+```{r}
+aggregate(body_mass_g ~ species, data = penguins, FUN = mean)
+
+#3733.088
+```
+

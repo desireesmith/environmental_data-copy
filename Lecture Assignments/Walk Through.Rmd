@@ -1,0 +1,67 @@
+---
+title: "Code Chunk"
+author: "Desiree Smith"
+date: "10/20/2021"
+output:
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r load_penguin_data, echo=TRUE, eval=TRUE}
+require(palmerpenguins)
+head(penguins)
+```
+
+```{r simple pairplot, fig.width=4, fig.asp= 1}
+plot(penguins[,3:5])
+
+```
+```{r}
+#How to create tabs
+
+{.tabset}
+{.tabset. tabset-pills}
+
+
+## 
+```
+
+{.tabset}
+
+{.tabset. tabset-pills}
+
+#Different Penguins Plot
+
+##Histogram
+```{r, fig.width=4, fig.asp= 1}
+hist(penguins$bill_length_mm)
+```
+
+##Flipper Length
+```{r flipper lenth histogram, echo = FALSE, fig.width=4, fig.asp= 1}
+hist(penguins$flipper_length_mm)
+```
+
+```{r}
+aggregate(penguins$flipper_length_mm,
+          list(penguins$species),
+          FUN  = mean, na.rm = TRUE)# seperating flipper length out by species. na.rm helps to still calculate with missing data
+
+
+#another way of doing it
+aggregate(flipper_length_mm ~ species,
+          data = penguins,
+          FUN = mean, na.rm = TRUE)
+
+boxplot(flipper_length_mm ~ species,
+        data = penguins, col = 90)
+
+
+```
+

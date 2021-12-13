@@ -1,0 +1,258 @@
+---
+title: "Models 1"
+subtitle: "Desiree Smith"
+author: "Alex Fink"
+date: "11/4/2021"
+output: 
+ html_document:
+    highlight: zenburn
+    toc: TRUE
+    toc_float: 
+      collapsed: FALSE
+  
+---
+
+```{r Walkthrough,include=FALSE }
+require("here")
+cat_rate = read.csv(here("data", "catrate.csv"))
+
+head(cat_rate)
+
+#summary of all columns
+summary(cat_rate)
+
+#histogram of the catastrophic rates
+hist(cat_rate$cat.rate)
+
+#Shapito Test
+shapiro.test(cat_rate$cat.rate)
+
+#The null hypothesis for Shapiro-Wilk test is: “The data were sampled from a normally-distributed population. The closer to 1 the closer it is to being close to normal
+
+#t test 
+t.test(cat_rate$cat.rate, mu = 2/7)
+
+t.test(cat_rate$cat.rate, mu = 2/7, alternative = "greater")
+
+```
+
+```{r Wilcoxon Test, include=FALSE}
+wilcox.test(cat_rate$cat.rate, mu = 2 / 7)
+
+```
+
+```{r Comparing two sample means, include=FALSE}
+require(palmerpenguins)
+
+# we want to exclude the gentoo penguins
+penguin_dat = droplevels(subset(penguins, species != "Gentoo"))
+
+summary(penguin_dat)
+
+boxplot(
+  flipper_length_mm ~ species, 
+  data = penguin_dat,
+  ylab = "Flipper Length (mm)")
+
+
+dat_adelie = subset(penguin_dat, species == "Adelie")
+
+
+dat_chin = subset(penguin_dat, species == "Chinstrap")
+
+
+shapiro.test(dat_adelie$flipper_length_mm )
+#for the adelie flipper length the W = 0.993 and the p-value = 0.72
+
+shapiro.test(dat_chin$flipper_length_mm )
+#for the chinstrap flipper length the W = 0.9889 and the p-value = 0.8106
+
+#t test of two groups flipper length
+t.test( flipper_length_mm ~ species, 
+  data = penguin_dat)
+
+
+wilcox.test(dat_adelie$flipper_length_mm )
+#for the adelie flipper length the V = 11476 and the p-value = <2.2e-16
+
+wilcox.test(dat_chin$flipper_length_mm )
+#for the chinstrap flipper length the V = 2346 and the p-value = 7.65e -13
+
+#you can use levels to find the base level 
+levels(penguin_dat$species)
+```
+
+## Question 1 {.tabset}
+
+ Create a histogram of the salamander reproduction catastrophic rates.
+Make sure you include an appropriate title and label for the x-axis.
+```{r Q1}
+hist(cat_rate$cat.rate, main = " Histogram of Salamander Reproduction Catastrophic Rates", xlab = "Catastrophic Rates", col = "firebrick2", border = "yellow")
+```
+
+## Question 2
+```{r Q2}
+shapiro.test(cat_rate$cat.rate)
+```
+
+## Question 3
+
+What is the null hypothesis for the Shapiro test?
+
+The null hypothesis for Shapiro-Wilk test states that the data is sampled from a normally-distributed population.
+
+## Question 4
+Based on the Shapiro test results, is there strong evidence that the sample came from a non-normally-distributed population?
+
+Since the p-value is less than 0.05 then we will reject the null hypothesis. 
+
+## Question 5
+Show the code you used to conduct the t-test.
+```{r}
+t.test(cat_rate$cat.rate, mu = 2/7)
+```
+
+
+## Question 6
+State the null hypothesis of the test, in plain nontechnical English.
+
+The null hypothesis is that the mean is equal to zero. So the null could be that the observed filling rate is is expected to be 0.28. Making the alternative if the rate is higher or lower. 
+
+## Question 7
+ Is this a one- or two-tailed test?
+ This is a one-tailed test since we were just looking at one factor.
+ 
+## Question 8
+What is the p-value from your t-test? Interpret the p-value as a false-positive rate using nontechnical English that a non-scientist would understand.
+
+The p-value from my t-test is 0.01193. A false positive is when you believe that the null is positive but it is actually not supported by the data. Using the cat data it tells us that the the catastrophic rate is different from the expected value.
+
+## Question 9
+What is the confidence interval for the difference between the null hypothesis and alternative hypothesis means? Did it include zero?
+
+```{r}
+require(boot)
+quantile(cat_rate$cat.rate,c(0.025, 0.975)) 
+
+
+boot_mean = function(x, i)
+{
+  return(mean(x[i], na.rm = TRUE))
+}
+
+mycatboot = 
+  boot(
+    data = cat_rate$cat.rate,
+    statistic = boot_mean,
+    R = 10000)
+print(mycatboot)
+
+
+
+#CI
+quantile(
+  mycatboot$t,
+  c(0.025, 0.975))
+
+```
+ It did not include zero.
+
+## Question 10
+Considering the results from your t-test, did you conclude that there was strong evidence to reject the null hypothesis?
+
+Yes, there is strong evidence to reject the null hypothesis. The p value is small which means we are supposed to reject the null hypothesis. 
+
+## Question 11
+Show the code you used to conduct the test.
+
+```{r}
+wilcox.test(cat_rate$cat.rate, mu = 2 / 7)
+```
+
+## Question 12
+Compare the p-value with the p-value you got from the t-test.
+
+The p-value that I received from the Wilcoxon test is smaller than the p-value that I received with my t.test.
+
+## Question 13
+Considering the results from your rank sum test, did you conclude that there was strong evidence to reject the null hypothesis?
+
+The p-value is even smaller now confirming that the null hypothesis will be rejected.
+
+## Question 14
+Compare the overall conclusions you could draw from the results of the two tests.
+
+Both test gave us a small p-value. This gives us enough evidence to reject the null hypothesis. This lets us know that the true location is not equal to 0.2857 like we expected. 
+
+## Question 15
+Considering the numerical and graphical data exploration, which test do you think was more appropriate for the data?
+
+I think that the Wilcoxon test is more appropriate for the data since it was able to give us a smaller p-value. It may be more accurate. 
+
+## Question 16
+Show the R-code you used to conduct tests of normality for the flipper lengths of Chinstrap and Adelie penguins.
+
+```{r}
+penguin_dat = droplevels(subset(penguins, species != "Gentoo"))
+
+boxplot(
+  flipper_length_mm ~ species, 
+  data = penguin_dat,
+  ylab = "Flipper Length (mm)")
+
+
+dat_adelie = subset(penguin_dat, species == "Adelie")
+
+dat_chin = subset(penguin_dat, species == "Chinstrap")
+
+
+shapiro.test(dat_adelie$flipper_length_mm )
+#for the adelie flipper length the W = 0.993 and the p-value = 0.72
+
+shapiro.test(dat_chin$flipper_length_mm )
+#for the chinstrap flipper length the W = 0.9889 and the p-value = 0.8106
+
+```
+
+## Question 17
+ Interpret the test results. Do you conclude that the flipper lengths are normally-distributed for each species? Make sure your answers make reference to the test output.
+ 
+I conclude that for both species the flipper lengths are normally distributed. For both species, the test showed that the p-values are greater than 0.05 and this signifies that the data is normally distributed.
+
+## Question 18
+
+```{r}
+image_file = "Models_hist_flipper.png"
+
+require(here)
+
+{
+png(
+  here("Images", "Models_hist_flipper.png"),
+  width = 1500, height = 1600)
+par(mfrow = c(2,2))
+
+hist(dat_adelie$flipper_length_mm, main = "Adelie Flipper Length", xlab = "Flipper Length", col = "palevioletred", border = "plum1")
+
+
+hist(dat_chin$flipper_length_mm, main = "Chinstrap Flipper Length", xlab = "Flipper Length", col = "cornflowerblue", border = "cyan3")
+
+}
+
+```
+
+## Question 19
+ State the alternative hypothesis of the test, in plain nontechnical English.
+ 
+The alternative hypothesis of the test is that there is a difference in flipper length between the Adelie and Chinstrap penguins. 
+ 
+## Question 20
+Include the code you used to conduct the t-test.
+Hint: your answer should only be a single line of code.
+
+```{r}
+
+t.test( flipper_length_mm ~ species, 
+  data = penguin_dat)
+```
+

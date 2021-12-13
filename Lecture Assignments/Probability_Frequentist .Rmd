@@ -1,0 +1,118 @@
+---
+title: "Probability and Frequentist Concepts"
+author: "Desiree Smith"
+date: "10/23/2021"
+output: html_document
+---
+
+__Question 1__
+What is the probability of observing a count of exactly 3 successes in a binomial distribution with parameters n = 4 and p = 0.75?
+```{r}
+dbinom(3, 4, 0.75, log = FALSE)
+#The probability is 0.42
+```
+
+__Question 2__
+ What is the probability of observing a count of 3 successes or fewer in a binomial distribution with parameters n = 4 and p = 0.75?
+
+```{r}
+pbinom(3, 4, 0.75,lower.tail = TRUE, log.p = FALSE )
+#0.68     
+```
+
+__Question 3__
+What is the probability of observing more than 3 successes in a binomial distribution with parameters n = 5 and p = 0.75?
+
+```{r}
+pbinom(3, 5, 0.75,lower.tail = TRUE, log.p = FALSE )
+#0.367
+```
+
+__Question 4__
+What is the probability of observing a value of less than 1.2 from a normally-distributed population with mean = 2 and standard deviation = 2?
+
+```{r}
+pnorm(1.2, mean = 2, sd = 2)
+#0.345
+```
+
+__Question 5__
+ What is the probability of observing a value of greater than 1.2 from a normally-distributed population with mean = 2 and standard deviation = 2?
+ 
+ 
+```{r}
+prob1 = pnorm(1.2, mean = 2, sd = 2)
+
+1 - prob1 #0.655
+
+#0.345 + x = 1
+# 0.655
+```
+
+__Question 6__
+ What is the probability of observing a value between 1.2 and 3.2 from a normally-distributed population with mean = 2 and standard deviation = 2?
+ 
+```{r}
+#less than 1.2 is 0.345 and greater is 0.655
+
+
+pnorm(3.2 , mean = 2, sd = 2) - pnorm(1.2 , mean = 2, sd = 2)
+
+# The probability is 0.381.
+
+
+
+```
+ 
+__Question 7__
+ Describe how the shape of the histogram changes as you continue to press the sample button.(n = 1, draws = 50)
+ 
+ As I pressed sample, the histogram the distribution started to slowly match the true distribution for the parameters alpha = 5.00 and beta = 1.42.
+ 
+
+__Question 8__
+Describe how the shape of the histogram changes as you continue to press the sample button. (n = 2, draws = 50)
+
+When I changed the sample size to 2 the histogram changed faster and took less time reaching the true distribution.
+ 
+
+__Question 9__
+ Describe how the shape of the histogram changes as you continue to press the sample button.
+ 
+ When I changed the sample size to 15 the histogram shrunk in size and became more narrow. It did not have as many bars and the data that was still there matched the peak of the distribution.
+
+__Question 10__
+Why is there such a drastic change in the shape of the sampling distribution when you change the sample size from 1 to 2?
+
+Since there was more samples available it helped remove some of the outliers in the data and tighten up the graph. 
+
+__Question 11__
+What are the two main factors that determine the width of the sampling distribution of the mean?
+
+The sample size and the parameters determine the width of the sampling distributions. The parameters effected how the data is distributed and the shape of the graph. The sample size effected how narrow or wide the histogram is.
+
+__Question 12__
+How many 3-character words are possible?
+There are 15625 possible character words.
+
+```{r}
+(25 * 25 ) #625
+(25 * 25 * 25) #15625
+
+
+```
+
+__Question 13__
+How many books would the Library contain if you added one additional position to the book size? Express your answer in terms of __B__.
+
+There would be 25^1328400 possible books making it an infinite number.
+
+
+```{r}
+(410 * 40 * 81) #1328400
+
+B = 1328400
+
+(25^B) #Inf
+```
+

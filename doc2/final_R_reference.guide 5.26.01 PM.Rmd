@@ -1,0 +1,225 @@
+---
+title: 'Final Project: R Reference Guide'
+author: "Desiree Smith"
+date: "12/12/2021"
+output: 
+ html_document:
+    highlight: breezedark
+    toc: TRUE
+    toc_float: 
+      collapsed: FALSE
+    theme: darkly
+  
+
+---
+
+# R Reference Guide {.tabset .tabset-pills}
+
+
+## Loading Data and Packages
+
+
+```{r Loading palmer penguins and here}
+require(here)
+require(palmerpenguins)
+library(palmerpenguins) 
+
+ginkgo = read.csv(here("data", "ginkgo_data_2021.csv"))
+```
+
+
+## Data Structures
+
+### c()
+
+* The function c() combines or concatenates its arguments into a vector (a 1-dimensional data structure consisting of 1 or more elements).
+
+* All of the elements must be of the same type.
+I can’t combine character and numeric types in the same call to c()
+Here’s two examples using numeric and character data types
+
+```{r}
+# Create a vector of numbers:
+num_vec  = c(1, 4, 8, 9, 13)
+```
+
+
+### length()
+
+* Helps to determine and set the length of vectors and factors
+
+```{r}
+length(ginkgo$max_width)
+```
+
+### matrix()
+
+* Helps to create a 2D data structure using your data. It can be created from vectors.
+
+```{r}
+matrix(ginkgo$max_width, byrow= 3, ncol= 6)
+```
+
+### data.frame()
+
+* Data frame is a way of storing data in R and how to structure it. They have the same number of rows.
+```{r}
+ginkgo_df= data.frame(ginkgo$max_width, 
+                      ginkgo$max_depth)
+
+```
+
+* __nrow__ is used to return the number of rows of the specified matrix and __ncol__ is used to return the number of columns. 
+```{r}
+nrow(ginkgo_df)
+ncol(ginkgo_df)
+```
+
+
+* dim is used to return/sets the dimension of the matrix. It shows the amount of rows and columns 
+
+```{r}
+dim(ginkgo_df)
+```
+
+## Subsetting 
+
+* Is a way to select variable and observations.You can use subset to specify the rows and columns you want to select in the data frame. You can subset by position and data frame as well.
+
+### subsetting by name 
+
+ginkgo$max_width
+
+### subsetting by position
+
+ginkgo[1,]
+ginkgo[2,3]
+ginkgo[,3]
+
+### subsetting by specific group
+
+subset(penguins, species == "Adelie")
+
+## Numerical Data Exploration
+
+* The summary function helps to put together a summary of statistics of data and model.
+
+```{r}
+summary(ginkgo)
+summary(ginkgo$max_width)
+```
+
+* mean () calculates the mean of the data you specifies and sd() helps to calculates the standard deviation.
+```{r}
+mean(ginkgo$max_width)
+
+sd(ginkgo$max_width)
+```
+
+## Graphical Data Exploration
+### Creating a graph
+
+* col = can be used to add color to your graph
+* main = allows you to create a title for the graph
+* xlab = and ylab = are used to label the x and y axis
+* xlim = and ylim = set the limits of the x and y axis
+* pch = allows you to change the shape of your symbol in scatterplots and other graphics. 
+* cex = allows you to change the size of your symbol
+
+```{r fig.width=10}
+ginkgo = read.csv(here("data", 
+                       "ginkgo_data_2021.csv"))
+
+
+ plot(max_depth ~ max_width, 
+      data = ginkgo, 
+      xlim = c(0,100),  
+      ylim = c(0, 100),
+  main = "Ginkgo Leaf Depth and Leaf Width",
+  ylab = "max leaf width", 
+  xlab = "max leaf depth", 
+  col = "palegreen", 
+  pch = 20, cex = 0.75)
+```
+
+* breaks = is used to control the number of bars, cells or bins in a histogram
+```{r fig.width=10}
+hist(penguins$flipper_length_mm,
+     main = "Penguin Flipper Length", 
+     xlab = "flipper length (mm)", 
+     col = "steelblue1", 
+     border = "yellowgreen", 
+     breaks = 40)
+```
+
+```{r fig.width=10}
+boxplot(ginkgo$petiole_length, col = "sandybrown")
+
+boxplot(notch_depth ~ seeds_present , 
+        data = ginkgo, 
+        ylab = "Notch Depth", 
+        xlab = "Seeds Present", 
+        col = "sandybrown")
+```
+
+* par(mfrow = c() creates a grid to to display your figures. For example, if you want two figures on the top and two at the bottom you use par(mfrow = c(2,2))
+
+### 4-panel figure of Histogram 
+```{r fig.width=10}
+dat_1 = rnorm(n = 344, mean = 202, sd = 802)
+dat_2 = rnorm(n = 344, mean = 4202, sd = 802)
+dat_3 = rnorm(n = 344, mean = 4202, sd = 802)
+dat_4 = rnorm(n = 344, mean = 4202, sd = 802)
+
+par(mfrow = c(2,2))
+
+hist(dat_1, 
+     main = "Random Data Histogram #1", 
+     xlab = "Data ", 
+     col = "yellow2")
+hist(dat_2, 
+     main = "Random Data Histogram #2", 
+     xlab = "Data ", 
+     col = "plum1")
+hist(dat_3, 
+     main = "Random Data Histogram #3", 
+     xlab = "Data ", 
+     col = "seashell")
+hist(dat_4, 
+     main = "Random Data Histogram #4", 
+     xlab = "Data ", 
+     col = "darkorange")
+```
+
+## Distribution Functions
+
+* dnorm = density function of the normal distribution
+```{r}
+dnorm(6, mean = 10.4, sd = 2.4)
+```
+
+* pnorm = distribution function 
+```{r}
+pnorm(1.2, mean = 2, sd = 2)
+```
+
+* qnorm = quantile function
+```{r}
+qnorm(0.85,mean=70,sd=3)
+```
+
+* dbinom(x, size, prob, log = FALSE)
+```{r}
+dbinom(3, 4, 0.75, log = FALSE)
+```
+
+* pbinom(q, size, prob, lower.tail = TRUE, log.p = FALSE)
+```{r}
+pbinom(3, 4, 0.75,lower.tail = TRUE,
+       log.p = FALSE )
+```
+
+* qbinom(p, size, prob, lower.tail = TRUE, log.p = FALSE)
+```{r}
+qbinom(.10, size=10, prob=.4)
+```

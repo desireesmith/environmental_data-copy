@@ -1,0 +1,320 @@
+---
+title: "Lab 5"
+subtitle: "Desiree Smith"
+author: "Alex, JT, Ethan, Justin"
+date: "10/15/2021"
+output: html_document
+---
+
+```{r}
+
+ricker_fun = function (x, a, b)
+{
+return(a * x * exp(-b * x))
+}
+
+curve(
+  ricker_fun(x, 1, 1),
+  from = 0, to = 5, add = FALSE,
+  main = "Ricker function: a = 1, b = 1",
+  ylab = "f(x)", xlab = "x"
+)
+
+```
+
+```{r}
+exp_fun = function(x, a, b)
+{
+    return(a * exp(-b * x))
+}
+
+curve(
+  exp_fun(x, 2.2, 1/15), add = FALSE, from = 0, to = 50,
+  ann = FALSE, axes = TRUE, ylab = "f(x)"); box()
+```
+
+
+```{r}
+
+# Seed the RNG so we can reproduce our results
+set.seed(1234567)
+
+# Specify the x-range and number of points:
+n_pts = 50
+x_min = 2
+x_max = 10
+
+# Generate the x-values
+x_sim = runif(n_pts, min = x_min, max = x_max)
+
+param_intercept = 2.3
+param_slope = 0.67
+y_pred = param_intercept + x_sim * param_slope
+plot(x_sim, y_pred, main = "Simulated Data\nNo Errors", xlab = "", ylab = "")
+ 
+```
+```{r}
+error_mean = 0
+error_sd = 0.25
+
+y_observed = 
+  y_pred + 
+  rnorm(
+    n = n_pts, 
+    mean = error_mean, 
+    sd = error_sd)
+plot(x_sim, y_observed, main = "Normally Distributed Errors\n Constant Variance", xlab = "", ylab = "")
+
+```
+```{r}
+error_mean = 0
+error_sd = 0.1
+
+y_observed_2 = 
+  y_pred + 
+  rnorm(
+    n = n_pts, 
+    mean = error_mean, 
+    sd = error_sd * x_sim)
+
+par(mfrow = c(1, 2))
+plot(x_sim, y_observed, main = "Normally Distributed Errors\n Constant Variance", xlab = "", ylab = "")
+plot(x_sim, y_observed_2, main = "Normally Distributed Errors\n Increasing Variance", xlab = "", ylab = "")
+
+```
+__Question 1 and 2__
+```{r}
+exp_fun = function(x, a, b)
+{
+    return(a * exp(-b * x))
+}
+
+
+
+ curve(
+   exp_fun(x, 1.9, 0.1), add = FALSE, from = 0, to = 50, ylab = "f(x)", 
+ col = 1, lty = 1)
+
+curve(
+  exp_fun(x, 1.9, 0.3), add = TRUE, from = 0, to = 50,
+  ylab = "f(x)", col = 1 , lty = 2)
+
+curve(
+  exp_fun(x, 1.2, 0.2), add = TRUE, from = 0, to = 50,
+  ylab = "f(x)", col = 2, lty = 1)
+curve(
+  exp_fun(x, 1.2, 0.4), add = TRUE, from = 0, to = 50,
+  ylab = "f(x)", col = 2, lty = 2)
+
+```
+
+__Question 3__
+When you change the parameter __a__ the curves seem to be less rounded and are closer to the x axis. The __a__ tell you where on the y axis that the graph will start at. 
+
+__Question 4__
+When you change the parameter __b__ then the curves move more to the left. It levels off faster when the __b__ is larger. They are look as if they would be decaying faster. 
+
+
+
+
+__Question 5__
+```{r}
+ricker_fun = function (x, a, b)
+{
+return(a * x * exp(-b * x))
+}
+
+curve(
+  ricker_fun(x, 1, 1),
+  from = 0, to = 30, add = FALSE, ylim = c(0, 100),
+  main = "Ricker function: a = 1, b = 1",
+  ylab = "f(x)", xlab = "x"
+)
+
+curve(
+  ricker_fun(x, 25, 0.1),
+  from = 0, to = 30, add = TRUE,
+  col = 1, lty = 1,
+  ylab = "f(x)", xlab = "x"
+ 
+)
+
+curve(
+  ricker_fun(x, 20, 0.2),
+  from = 0, to = 30, add = TRUE,
+  col = 1, lty = 2,
+  ylab = "f(x)", xlab = "x"
+
+)
+
+curve(
+  ricker_fun(x, 10, 0.2),
+  from = 0, to = 30, add = TRUE,
+  col = 1, lty = 3,
+  ylab = "f(x)", xlab = "x"
+
+)
+
+curve(
+  ricker_fun(x, 75, 0.3),
+  from = 0, to = 30, add = TRUE,
+  col = 2, lty = 1,
+  ylab = "f(x)", xlab = "x"
+)
+
+curve(
+  ricker_fun(x, 50, 0.3),
+  from = 0, to = 30, add = TRUE,
+  col = 2, lty = 2,
+  ylab = "f(x)", xlab = "x"
+ 
+)
+
+curve(
+  ricker_fun(x, 40, 0.3),
+  from = 0, to = 30, add = TRUE,
+  col = 2, lty = 3,
+   ylab = "f(x)", xlab = "x"
+ 
+)
+
+```
+__Question 6__ 
+
+When you change the parameter __a__ it changes the height of the curve. As the __a__ gets larger the peaks are higher. 
+
+__Question 7__
+When you change parameter _b_ it effects how narrow the curves on the Ricker function are. The lower the _b_the thinner the graph is. It effects the width of the function. 
+
+__Question 8 and 9__
+```{r dispersal}
+require(here)
+dat_sal = read.csv(here("data", "dispersal.csv"))
+dat_sal
+
+```
+```{r}
+
+  line_point_slope = function(x, x1, y1, slope)
+  {
+    get_y_intercept = 
+      function(x1, y1, slope) 
+        return(-(x1 * slope) + y1)
+    
+    linear = 
+      function(x, yint, slope) 
+        return(yint + x * slope)
+    
+    return(linear(x, get_y_intercept(x1, y1, slope), slope))
+  }
+
+guess_y = 0.1
+guess_x = 3
+guess_slope = 0
+
+x = dat_sal$dist.class
+y = dat_sal$disp.rate.ftb
+
+plot(x, y, pch = 16, xlab = "distance class", ylab = "first-time breeders", col = "gold")
+
+curve(line_point_slope(x, x,guess_y, guess_slope), add = T)
+
+# I chose these parameters because a majority of the data point are towards the x axis. I wanted a line that went through these point and were close for a better fit.  
+```
+
+__Question 10 and 11__
+```{r}
+exp_fun = function(x, a, b)
+{
+    return(a * exp(-b * x))
+}
+
+
+x = dat_sal$dist.class
+y = dat_sal$disp.rate.ftb
+
+
+plot(x, y, pch = 16, xlab = "distance class", ylab = "first-time breeders", col = "maroon2")
+
+
+curve(
+  exp_fun(x, 2 , 0.012), add = TRUE, from = 0, to = 1600, xlim = c(0, 1500),
+  ann = FALSE, ylab = "f(x)",
+  col = "navyblue", lty = 1)
+
+
+exp_a = 1
+exp_b = 0.0025
+
+#correct curve
+curve(
+  exp_fun(x, exp_a , exp_b), add = TRUE, from = 0, to = 1600, xlim = c(0, 1500),
+  ann = FALSE, ylab = "f(x)",
+  col = "navyblue", lty = 2)
+
+
+
+# Q11: When I first started to work with the parameters the b was too high. The function was off of the graph and I could not see the whole thing. So I slowly adjusted the b so I could see the curve better and it was a better fit. The line fell in the middle of the points. For a, I chose that value because it adjusted the decay of the function and how it falls. I adjusted the graph from the solid blue line to the dotted by making the b smaller.
+
+```
+
+__Question 12 and 13__
+```{r}
+ricker_fun = function (x, a, b)
+{
+return(a * x * exp(-b * x))
+}
+
+x = dat_sal$dist.class
+y = dat_sal$disp.rate.ftb
+
+
+plot(x, y, pch = 16, xlab = "distance class", ylab = "first-time breeders", col = "lavender")
+
+ricker_a = 1/290
+ricker_b = 1/300
+  
+curve(
+  ricker_fun(x,ricker_a, ricker_b), ylim = c(400,1500),
+  from = 0, to = 1500, add = TRUE,
+  col = "burlywood4", lty = 1
+)
+
+#For a and b I have to pick small values. The peak of the scatter plot is located at 400. So this is where I want the peak of the curve to be. So I used 1/300 so the curve will fit the data. The parameter a, helped determine where the functions starts on the y axis and so I picked 1/290 since it helped the graph have a nice height to be a good fit for the data. 
+```
+
+__Question 14 and 15__
+
+```{r, fig.asp=1/3}
+sal_df= data.frame(x = dat_sal$dist.class, y_observed = dat_sal$disp.rate.ftb)
+ sal_df
+ 
+  sal_df$y_predicted_linear = line_point_slope(sal_df$x, guess_x, guess_y, guess_slope)
+  sal_df
+  
+  sal_df$resids_linear= (sal_df$y_observed - sal_df$y_predicted_linear)
+ 
+  sal_df$y_predicted_exp = exp_fun(sal_df$x, exp_a, exp_b)
+  sal_df
+  
+    
+  sal_df$resids_exp = (sal_df$y_observed - sal_df$y_predicted_exp)
+  
+  sal_df$resids_ricker = (sal_df$y_observed - sal_df$resids_exp)
+ 
+  sal_df$y_predicted_ricker = ricker_fun(sal_df$x, ricker_a, ricker_b)
+  sal_df
+  sal_df$resids_ricker = (sal_df$y_observed - sal_df$y_predicted_ricker)
+  
+  par(mfrow = c(1,3))
+  #“resids_linear”
+  hist(sal_df$resids_linear, main = " Histogram of Linear Residuals", xlab = "Linear Residuals", col = "darkorange")
+  
+  #“resids_exp”
+  hist(sal_df$resids_exp, main = " Histogram of Exponent Residuals", xlab = "Exponent  Residuals", col = "blue3")
+  
+  #"resids_ricker"
+  hist(sal_df$resids_ricker, main = " Histogram of Ricker Residuals", xlab = "Ricker Residuals", col = "springgreen4")
+  
+```
+

@@ -1,0 +1,203 @@
+---
+title: "Lab 8 Questions"
+author: "Desiree Smith"
+date: "11/3/2021"
+output: 
+ html_document:
+    highlight: zenburn
+    toc: TRUE
+    toc_float: 
+      collapsed: FALSE
+  
+---
+---
+
+### Question 1 {}
+Calculate the standard deviation of the differences in mean flipper length from your bootstrap simulation. Show the R-code you used to find do the calculation.
+```{r Q1}
+require(palmerpenguins)
+penguin_dat = droplevels(subset(penguins, species != "Gentoo"))
+
+require(simpleboot)
+dat_adel = droplevels(subset(penguin_dat, species == "Adelie"))
+
+dat_chin = droplevels(subset(penguin_dat, species == "Chinstrap"))
+
+pen_boot = two.boot(dat_adel$flipper_length_mm, dat_chin$flipper_length_mm, FUN = mean, R = 10000, na.rm = TRUE)
+
+sd(pen_boot$t)
+```
+
+### Question 2
+Include your histogram in your lab report
+```{r}
+hist(pen_boot$t, main = "Mean of Differences in Mean flipper Length", col = "steelblue1", border = "chartreuse1", xlab = "Mean Values" )
+```
+
+### Question 3
+What was the 95% bootstrap CI you calculated using quantile()? Show the R-code you used to answer the question.
+```{r}
+quantile(pen_boot$t, c(0.025, 0.975))
+         
+```
+
+### Question 4
+Do you think the resampled differences in means follow a skewed distribution? Your answer should make reference to the mean, median, and histogram of the differences in means.
+
+The mean and the median of the means are both similar and around -5.86. This would tell us that the means do not follow a skewed distribution. 
+```{r}
+median(pen_boot$t) 
+# the median is -5.861
+mean(pen_boot$t)
+#the mean is -5.867
+
+```
+
+### Question 5
+Show the R-code you used to create pen_ecdf()
+```{r}
+pen_ecdf = ecdf(pen_boot$t)
+
+```
+
+### Question 6
+What is the probability, according to the empirical distribution function, of observing a mean difference of -4.5 or greater? Show the R code you used to perform the calculation.
+```{r}
+1 - pen_ecdf(-4.5)
+```
+
+### Question 7
+What is the probability, according to the empirical distribution function, of observing a mean difference of -8 or smaller? Show the R code you used to perform the calculation.
+
+```{r}
+pen_ecdf(-8)
+```
+
+### Question 8
+State the null and alternative hypotheses of a two-sample, two-tailed test for the difference in mean flipper lengths between the two penguin species.
+
+The Null hypotheses states that there is not a difference in the flipper length between the two species. The alternative would be that the there is a true difference in means in flipper length between the two species and that the difference is less than 0.
+
+### Question 9
+What was the p-value? Show the R-code you used to find out.
+
+0.05582
+```{r}
+require("here")
+veg_dat = read.csv(here("data", "vegdata.csv"))
+plant_dat = veg_dat[,-5] 
+pine_dat = plant_dat[, -6]
+
+dat_tree = droplevels(subset(pine_dat, treatment %in% c("control", "clipped")))
+head(dat_tree)
+
+pine_boot = t.test( pine ~ treatment, dat = dat_tree)
+```
+
+### Question 10
+What were the endpoints of your bootstrap CI? Show the R-code you used to find out.
+
+The end points are 3.07 and 28.93 for the bootstrap CI.
+
+```{r}
+tree_boot = 
+  two.boot(
+    subset(dat_tree, treatment == "clipped")$pine,
+    subset(dat_tree, treatment == "control")$pine,
+    FUN = mean,
+    R = 10000,
+    na.rm = TRUE
+  )
+
+# sum(tree_boot$t >= 0)
+# sum(tree_boot$t < 0)
+
+
+
+
+```
+
+### Question 11
+What is the observed difference in mean tree counts and does it fall within the 95% bootstrap CI?
+
+The observed difference in the mean tree counts is 16 so it fall within the 95% bootstrap CI.
+
+```{r}
+
+mean(tree_boot$t)
+quantile(tree_boot$t, c(0.025, 0.975))
+```
+
+### Question 12
+Briefly describe the Simpson diversity index, and explain what it quantifies.
+
+This diversity index measures diversity and the number of species present ans it quantifies the abundance.
+
+### Question 13
+
+Show the code you used to z-standardize the s.sidi column.
+
+```{r}
+
+dat_bird = read.csv(here("data", "bird.sub.csv"))
+
+dat_habitat = read.csv(here("data", "hab.sub.csv"))
+
+dat_all = merge(
+  dat_bird, 
+  dat_habitat,
+  by = c("basin", "sub"))
+
+```
+
+### Question 14 - 15
+```{r}
+
+dat_1 = 
+  subset(
+    dat_all,
+    select = c(b.sidi, s.sidi))
+
+m = 10000 
+result = numeric(m) 
+
+
+for(i in 1:m)
+{
+  index_1 = sample(nrow(dat_1), replace = TRUE)
+index_2 = sample(nrow(dat_1), replace = TRUE)
+
+dat_resampled_i = 
+  data.frame(
+    b.sidi = dat_1$b.sidi[index_1],
+    s.sidi = dat_1$s.sidi[index_2]
+  )
+
+fit_resampled_i = lm(b.sidi ~ s.sidi, data = dat_resampled_i)
+slope_resampled_i = coef(fit_resampled_i)[2]
+
+#print(slope_resampled_i)
+  result[i] = coef(fit_resampled_i)[2]
+} 
+
+
+fit_1 = lm(b.sidi ~ s.sidi, data = dat_all)
+coef(fit_1)
+
+slope_observed = coef(fit_1)[2]
+
+hist(result, main = "Null Distribution of Regression Slope", xlab = "Slope Parameter", col = "steelblue")
+abline(v = slope_observed, lty = 2, col = "red", lwd = 2)
+
+
+```
+
+### Question 16
+What was your critical value? Was the observed slope less than the critical value?
+```{r}
+quantile(result, c(.05))
+```
+
+### Question 17
+
+The negative slope value of -0.0132 tells us that their is a negative relationship between vegetation cover diversity and bird diversity. This lets us know that it was observed that as the vegetation cover diversity increases the bird diversity decreases and vice versa.

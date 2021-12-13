@@ -1,0 +1,275 @@
+---
+title: "Lab 9"
+author: "Desiree Smith"
+date: "11/9/2021"
+output: 
+ html_document:
+    highlight: zenburn
+    toc: TRUE
+    toc_float: 
+      collapsed: FALSE
+---
+
+```{r Walkthrough , include=FALSE}
+require(here)
+catrate = read.csv(here("data", "catrate.csv"))
+head(catrate)
+
+
+#binomial test
+n_success = sum(catrate$success)
+n_years = sum(catrate$years)
+binom.test(n_success, n_years)
+
+binom.test(n_success, n_years, p = 5/7) 
+binom.test(
+  n_success,
+  n_years,
+  p = 5/7,
+  alternative='less')
+
+veg = read.csv(here("data", "vegdata.csv"))
+head(veg)
+
+#boxplot
+boxplot(pine ~ treatment, data = veg)
+
+#variance test
+var.test(
+  pine ~ treatment,
+  data = veg,
+  subset = treatment %in% c('control','clipped'))
+
+#shapiro test 
+shapiro.test(veg$pine[veg$treatment=="control"])
+
+shapiro.test(veg$pine[veg$treatment=="clipped"])
+
+fligner.test(
+  pine ~ treatment,
+  data = veg,
+  subset = treatment %in% c('control','clipped'))
+
+bartlett.test(pine ~ treatment, data=veg)
+
+fligner.test(pine ~ treatment, data = veg)
+
+#t test
+t.test(pine~treatment,data=veg,subset=treatment %in% c('control','clipped'), conf.int=TRUE)
+
+
+```
+
+```{r walkthrough, include=FALSE }
+
+#Wilcox test
+wilcox.test(pine~treatment,data=veg,subset=treatment %in% c('control','clipped'), conf.int=TRUE)
+
+#create separate vectors for the “control” observations and “clipped” observations
+control = veg$pine[veg$treatment=='control']
+clipped = veg$pine[veg$treatment=='clipped']
+
+#paired t-test
+t.test(control, clipped, paired=TRUE)
+
+wilcox.test(control, clipped, paired=TRUE)
+
+disp = read.csv(here("data", "dispersal.csv"))
+
+disp
+
+plot(disp$disp.rate.ftb, disp$disp.rate.eb)
+
+#testing the significance of the correlation
+cor.test(
+  disp$disp.rate.ftb,
+  disp$disp.rate.eb,
+  use='complete.obs')
+
+cor.test(
+  disp$disp.rate.ftb,
+  disp$disp.rate.eb,
+  use='complete.obs',
+  method='spearman')
+
+#sample of dispersal rates
+plot(
+  ecdf(disp$disp.rate.ftb),
+  verticals=TRUE)
+
+#adult dispersal rate 
+plot(
+  ecdf(disp$disp.rate.ftb),
+  verticals=TRUE)
+plot(
+  ecdf(disp$disp.rate.eb),
+  verticals=TRUE,
+  lty=3,
+  add=TRUE)
+```
+
+```{r walkthrough , include=FALSE}
+ks.test(disp$disp.rate.ftb,disp$disp.rate.eb)
+
+#This is a simple binomial proportions test, which we can easily do in R by specifying two vectors:the number of mortalities for females and males c(4,16)the total number of female and male candidates: c(40,250)
+
+prop.test(c(4,16),c(40,250))
+
+#Fisher's exact test
+fisher.test
+
+#bird habitat data
+birds   = read.csv(here("data", "bird.sta.csv"))
+hab     = read.csv(here("data", "hab.sta.csv"))
+birdhab = merge(birds, hab, by=c("basin", "sub", "sta"))
+
+# Create a contingency table for edge/interior and brown creeper presence/absence
+table(birdhab$s.edge, birdhab$BRCR > 0)
+
+# set the presence to be in the first column
+br_creeper_table = table(birdhab$s.edge, birdhab$BRCR > 0)[, 2:1]
+
+owls = matrix(c(16, 9, 4, 11), nrow=2)
+rownames(owls) = c("present", "absent")
+colnames(owls) = c("old", "young")
+chisq.test(owls)
+
+
+```
+
+
+### Question 1
+State the null hypothesis of the Chi-square test.
+
+The null hypothesis of the chi- square test is that there is no significant relationship for the data. 
+
+
+### Question 2
+Consider the results of your test and explain whether you think that Brown Creepers show a significant habitat preference.
+
+Based on the results of test you can see that the brown creepers do show significant a significant relationship. The p-value is very small so we will reject the null.
+
+```{r}
+owls = matrix(c(16, 9, 4, 11), nrow=2)
+rownames(owls) = c("present", "absent")
+colnames(owls) = c("old", "young")
+chisq.test(br_creeper_table)
+```
+
+### Question 3 -5
+
+```{r}
+require(palmerpenguins)
+penguins
+
+fit_species =
+  lm( formula = body_mass_g
+    ~ species,
+    data = penguins)
+fit_species
+
+fit_sex = 
+  lm(
+    formula = body_mass_g ~ sex,
+    data = penguins)
+fit_sex
+
+fit_both = 
+  lm(
+    formula = body_mass_g ~ sex * species,
+    data = penguins)
+fit_both
+
+```
+
+### Question 6
+ Include a conditional boxplot corresponding to your fit_species model.
+
+```{r}
+boxplot(body_mass_g ~ species,
+    data = penguins, ylab = "body mass (g)",col= "lightskyblue1"
+             
+             )
+
+
+```
+
+### Question 7
+Include a conditional boxplot corresponding to your fit_sex model.
+
+```{r}
+boxplot(body_mass_g ~ sex,
+    data = penguins, ylab = "body mass (g)",col= "peachpuff1")
+             
+```
+
+
+
+
+### Question 8
+ Include a conditional boxplot corresponding to your fit_species model.
+ 
+```{r}
+#Example
+boxplot(body_mass_g ~ sex * species,
+    data = penguins, ylab = "body mass (g)",col= "lavender",
+   names = c("Adelie\n female",
+             "Adelie\n male",
+             "Chinstrap\n female",
+             "Chinstrap\n male",
+             "Gentoo\n female",
+             "Gentoo\n male"
+             
+             ))
+
+
+```
+
+### Question 9
+Based on the shapes of the boxes, which of the models (if any) do you think may have problems fulfilling the heterogeneity assumption?
+
+The model that includes penguin body mass of species does not fulfill the heterogeneity assumption. The shapes of the boxes vary the most out of all of the models. 
+
+### Question 10
+State the null hypothesis of the Bartlett test.
+
+The Null hypothesis of the Bartlett test is that the all of the variances are equal to each other.
+
+### Question 11
+ What was the p-value from the Bartlett test of homogeneity for observations grouped by species?
+ 
+The p-value for the test is 0.050.
+```{r}
+bartlett.test(body_mass_g ~ species, data= penguins)
+```
+
+### Question 12
+What was the p-value from the Bartlett test of homogeneity for observations grouped by sex?
+
+The p-value is 0.032.
+```{r}
+bartlett.test(body_mass_g ~ sex, data= penguins)
+```
+
+### Question 13
+What was the p-value from the Bartlett test of homogeneity for observations grouped by both factors?
+
+The p-value of Bartlett test 0.1741. It is not very significant.
+
+```{r}
+dat_groups = aggregate(
+  body_mass_g ~ species * sex,
+  data = penguins,
+  FUN = c)
+str(dat_groups)
+
+bartlett.test(dat_groups$body_mass_g
+)
+```
+
+
+### Question 14
+Based on the results of the Bartlett tests, do you anticipate any issues with heterogeneity in any of the models? Make sure you justify your response with the results of your tests.
+
+Since the p-value is 0.1741 it is pretty high and does not seem to be very significant. Because of this we will accept the null that that there is homogeneity. In previous questions (12 & 13), the p-value was significant so we would reject the null.  
+

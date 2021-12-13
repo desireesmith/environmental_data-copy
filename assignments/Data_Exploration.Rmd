@@ -1,0 +1,103 @@
+---
+title: "Data exploration"
+author: "Worked with Alex Fink, JT"
+date: "9/17/2021"
+output:
+  html_document:
+    df_print: paged
+subtitle: Desiree Smith
+---
+
+
+```{r}
+require("here")
+getwd()
+
+here()
+
+data_habitat = data.frame(read.csv(here("data", "hab.sta.csv")))
+
+```
+
+```{r}
+par(mfrow = c (1,3))
+hist(data_habitat$slope, xlab = "Slope", main = "Slope of Terrain", col = "blue")
+hist(data_habitat$aspect, xlab = "Aspect", main = "Aspect of Terrain", col = "orange")
+hist(data_habitat$elev, xlab = "Elevation", main = "Elevation of Terrain", col = "green")
+```
+
+
+__Question 2__
+The shape of the elevation histogram is negatively skewed to the left. The elevations that are 500 meters and less seem to occur more frequently. This is where a bulk of the observations were made. The stations that were found in these areas of lower elevations seen more birds in the area. 
+
+__Question 3__
+The units of slope in the data set is percent slope. 
+
+__Question 4__
+Unlike the elevation histogram the slope histogram is not skewed in one direction. The shape of the slope histogram is a bell shaped curve. The highest values are in the middle and the lower values are on the outside. Most of the sample sites are steep but there is still a good amount of shallow slopes. 
+
+__Question 5__
+An aspect is the direction that the that the physical slope is facing. 
+
+__Question 6__
+Looking at the aspect histogram the values are evenly distributed. It has a uniform look with some variation. The sample sites tend be slightly more north-facing but there is still a good amount of south facing. This can show that the birds may not have a strong preference when it comes to which direction the terrain is facing. 
+
+
+
+__Question 7__
+```{r}
+line_point_slope = function(x, x1, y1, slope)
+{
+  get_y_intercept = 
+    function(x1, y1, slope) 
+      return(-(x1 * slope) + y1)
+  
+  linear = 
+    function(x, yint, slope) 
+      return(yint + x * slope)
+  
+  return(linear(x, get_y_intercept(x1, y1, slope), slope))
+}
+
+par(mfrow = c (1,3))
+plot(ba.tot ~ slope, data = data_habitat, main = "Slope", ylab = "Basal Area", xlab = "Slope", col = "blue")
+curve(line_point_slope(x, x1 = 3.5, y1 = 1.25, slope = 0.3), add = TRUE)
+plot(ba.tot ~ elev, data = data_habitat, main = "Aspect", ylab = "Basal Area", xlab = "Aspect", col = "orange")
+curve(line_point_slope(x, x1 = 3.5, y1 = 1.25, slope = 0.05), add = TRUE)
+plot(ba.tot ~ elev, data = data_habitat, main = "Elevation", ylab = "Basal Area", xlab = "Elevation", col = "green")
+curve(line_point_slope(x, x1 = 3.5, y1 = 1.25, slope = 0.04), add = TRUE)
+```
+
+
+__Question 8__
+For each terrain variable (elevation, slope, aspect), describe the relationship you observe and your model fit. You should consider
+
+Is there a noticeable association?
+If so, is it linear?
+Based on a visual assessment, is your linear model a good fit for the data, why or why not?
+
+When I look at the scatter plots I do not see a strong correlation in any of the terrain variable. Looking at the slope I see not noticeable any correlation. The Aspect and elevation model seems like there may be a weak negative correlation but it is not strong. The data does not go strongly in one direction. It goes straight up and slightly to the left. The points are clumped together around the line a best fit so this can show some strong association of the data. The line goes through a majority of the points that were observed.
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
